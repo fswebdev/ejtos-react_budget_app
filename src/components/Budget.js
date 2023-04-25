@@ -1,21 +1,3 @@
-/*import React, { useContext} from 'react';
-import {AppContext} from '../context/AppContext';
-const Budget = () => {
-    const {currency,budget,dispatch} = useContext(AppContext);
-
-      function handleChange(e) {
-        dispatch({ type: 'UPDATE_BUDGET_AVAILABLE', payload: e.target.value });
-        //dispatch({type: 'CHG_CURRENCY', payload: e.target.value})
-      }
-    
-    return (
-        <div className='alert alert-secondary'>
-            <span>Budget: {currency}<input type="number" step="10" min="2000" max="20000" value={budget} onChange={handleChange}/></span>
-        </div>
-    );
-};
-export default Budget;*/
-
 import React, { useContext, useEffect} from 'react';
 import {AppContext} from '../context/AppContext';
 const Budget = ({ min=2000, max=20000, step=10 }) => {
