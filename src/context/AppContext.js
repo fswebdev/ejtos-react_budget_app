@@ -25,11 +25,13 @@ export const AppReducer = (state, action) => {
                     ...state,
                 };
             } else {
-                alert("Cannot increase the allocation! Out of funds");
+                alert("You cannot reduce the budget value lower than the spending");
+                //alert("Cannot decrease the allocation! Out of funds");
                 return {
                     ...state
                 }
             }
+
             case 'RED_EXPENSE':
                 const red_expenses = state.expenses.map((currentExp)=> {
                     if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
@@ -57,18 +59,35 @@ export const AppReducer = (state, action) => {
                 ...state,
                 budget
             };
-        case 'SET_BUDGET':
-            action.type = "DONE";
-            state.budget = action.payload;
-
+            case "SET_ERROR":
             return {
                 ...state,
+                error: action.payload
             };
+            case 'SET_BUDGET':
+                action.type = "DONE";
+                state.budget = action.payload;
+    
+                return {
+                    ...state,
+                };
+        case 'UPDATE_BUDGET_AVAILABLE':
+                return { 
+                    ...state, 
+                    budget: action.payload
+                };
         case 'CHG_CURRENCY':
             action.type = "DONE";
-            state.currency = action.payload;
             return {
-                ...state
+                ...state,
+                currencyselection: action.payload.currencyselection,
+                currency: action.payload.currency
+            }
+        case 'CURRENCY_DEF':
+            
+            return {
+                ...state,
+                currency: action.payload.currency
             }
 
         default:
@@ -77,7 +96,7 @@ export const AppReducer = (state, action) => {
 };
 
 // 1. Sets the initial state when the app loads
-const initialState = {
+export const initialState = {
     budget: 2000,
     expenses: [
         { id: "Marketing", name: 'Marketing', cost: 50 },
@@ -86,32 +105,40 @@ const initialState = {
         { id: "Human Resource", name: 'Human Resource', cost: 40 },
         { id: "IT", name: 'IT', cost: 500 },
     ],
+    currencyselection:{ 
     currency: '£'
+    }
 };
 
 // 2. Creates the context this is the thing our components import and use to get the state
-export const AppContext = createContext();
+export const AppContext = createContext(initialState);
 
 // 3. Provider component - wraps the components we want to give access to the state
 // Accepts the children, which are the nested(wrapped) components
 export const AppProvider = (props) => {
     // 4. Sets up the app state. takes a reducer, and an initial state
     const [state, dispatch] = useReducer(AppReducer, initialState);
-    let remaining = 0;
+    //let remaining = 0;
+    let spending = 0
 
-    if (state.expenses) {
+   /* if (state.expenses) {
             const totalExpenses = state.expenses.reduce((total, item) => {
             return (total = total + item.cost);
         }, 0);
         remaining = state.budget - totalExpenses;
+    }*/
+    if (state.expenses) {
+        const totalExpenses = state.expenses.reduce((total, item) => {
+        return (total = total + item.cost);
+    }, 0);
+    spending = state.budget - totalExpenses;
     }
-
     return (
         <AppContext.Provider
             value={{
                 expenses: state.expenses,
                 budget: state.budget,
-                remaining: remaining,
+                spending: spending,
                 dispatch,
                 currency: state.currency
             }}
